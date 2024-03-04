@@ -7,8 +7,9 @@ const foods = [
     { id: "bananes", name: "Bananes", benefit: "Potassium: Fonctionnement du système nerveux et des muscles, abaisse la pression artérielle." },
     { id: "epinards", name: "Épinards", benefit: "Fer: Nécessaire à la formation de l'hémoglobine, réduit la fatigue et l'anémie." },
     { id: "amandes", name: "Amandes", benefit: "Calcium: Crucial pour les os et les dents, fonction musculaire et coagulation sanguine." }
-    // Vous pouvez continuer à ajouter d'autres aliments et bienfaits ici
 ];
+    // Vous pouvez continuer à ajouter d'autres aliments et bienfaits ici
+    let currentDraggedElementId = null;
 
 function setupGame() {
     const foodsContainer = document.getElementById('foods');
@@ -18,48 +19,68 @@ function setupGame() {
         const foodElement = document.createElement('div');
         foodElement.classList.add('item');
         foodElement.textContent = food.name;
-        foodElement.draggable = true;
         foodElement.id = `food-${food.id}`;
-
-        foodElement.addEventListener('dragstart', (e) => {
-            e.dataTransfer.setData('text/plain', food.id);
-        });
+        makeDraggable(foodElement);
 
         const benefitElement = document.createElement('div');
         benefitElement.classList.add('item', 'benefit');
         benefitElement.textContent = food.benefit;
-        benefitElement.id = `benefit-${food.id}`;
-
-        benefitElement.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            benefitElement.classList.add('drag-enter');
-        });
-
-        benefitElement.addEventListener('dragleave', () => {
-            benefitElement.classList.remove('drag-enter');
-        });
-
-        benefitElement.addEventListener('drop', (e) => {
-            const id = e.dataTransfer.getData('text/plain');
-            if (id === food.id) {
-                benefitElement.textContent += ` - ${food.name}`;
-                benefitElement.classList.remove('drag-enter');
-                const foodElement = document.getElementById(`food-${id}`);
-                foodElement.style.display = 'none'; // Cache l'élément de l'aliment
-                foodElement.draggable = false;
-            } else {
-                // Gestion d'une association incorrecte
-                benefitElement.classList.add('drag-wrong');
-                setTimeout(() => { benefitElement.classList.remove('drag-wrong'); }, 1500); // Enlève le rouge après 1.5 secondes
-            }
-        });
+        benefitElement.setAttribute('data-food-id', food.id);
+        makeDroppable(benefitElement);
 
         foodsContainer.appendChild(foodElement);
         benefitsContainer.appendChild(benefitElement);
     });
 }
 
+function makeDraggable(element) {
+    element.draggable = true;
+    element.addEventListener('dragstart', (e) => {
+        e.dataTransfer.setData('text/plain', element.id);
+    });
+
+    element.addEventListener('touchstart', (e) => {
+        currentDraggedElementId = element.id;
+    }, false);
+
+    element.addEventListener('touchend', (e) => {
+        currentDraggedElementId = null;
+    }, false);
+}
+
+function makeDroppable(element) {
+    element.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        element.classList.add('drag-enter');
+    });
+
+    element.addEventListener('dragleave', () => {
+        element.classList.remove('drag-enter');
+    });
+
+    element.addEventListener('drop', (e) => {
+        handleDrop(element, e.dataTransfer.getData('text/plain').replace('food-', ''));
+    });
+
+    element.addEventListener('touchend', (e) => {
+        if (currentDraggedElementId) {
+            handleDrop(element, currentDraggedElementId.replace('food-', ''));
+        }
+    }, false);
+}
+
+function handleDrop(element, id) {
+    if (id === element.getAttribute('data-food-id')) {
+        element.textContent += ` - ${document.getElementById(`food-${id}`).textContent}`;
+        document.getElementById(`food-${id}`).style.display = 'none';
+    } else {
+        element.classList.add('drag-wrong');
+        setTimeout(() => {
+            element.classList.remove('drag-wrong');
+        }, 1500);
+    }
+    element.classList.remove('drag-enter');
+    currentDraggedElementId = null;
+}
+
 setupGame();
-
-
-
