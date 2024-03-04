@@ -41,20 +41,16 @@ function setupGame() {
 
         benefitElement.addEventListener('drop', (e) => {
             const id = e.dataTransfer.getData('text/plain');
-            benefitElement.classList.remove('drag-enter');
-
             if (id === food.id) {
                 benefitElement.textContent += ` - ${food.name}`;
+                benefitElement.classList.remove('drag-enter');
                 const foodElement = document.getElementById(`food-${id}`);
-                foodElement.classList.add('matched');
+                foodElement.style.display = 'none'; // Cache l'élément de l'aliment
                 foodElement.draggable = false;
             } else {
-                // Marque la tentative comme échouée
-                benefitElement.classList.add('drag-fail');
-                // Optionnel: Réinitialise la couleur après un court délai
-                setTimeout(() => {
-                    benefitElement.classList.remove('drag-fail');
-                }, 1500);
+                // Gestion d'une association incorrecte
+                benefitElement.classList.add('drag-wrong');
+                setTimeout(() => { benefitElement.classList.remove('drag-wrong'); }, 1500); // Enlève le rouge après 1.5 secondes
             }
         });
 
@@ -64,5 +60,6 @@ function setupGame() {
 }
 
 setupGame();
+
 
 
