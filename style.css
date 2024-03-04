@@ -1,10 +1,13 @@
 body {
     font-family: Arial, sans-serif;
     text-align: center;
+    margin: 0;
+    padding: 10px;
 }
 
 .container {
     display: flex;
+    flex-wrap: wrap;
     justify-content: space-around;
     margin-top: 20px;
 }
@@ -15,23 +18,40 @@ body {
     gap: 10px;
 }
 
-.item {
+.item, .benefit {
     padding: 10px;
     background-color: #f0f0f0;
     border: 1px solid #ddd;
+    min-width: 100px; /* Assurez-vous que les éléments ne deviennent pas trop petits */
     cursor: grab;
+    text-align: center;
 }
 
 .benefit {
-    padding: 10px;
     background-color: #add8e6;
-    border: 1px solid #ddd;
     min-height: 50px;
 }
 
 .drag-enter {
     background-color: #90ee90;
 }
+
 .drag-fail {
-    background-color: #ffcccc;
+    background-color: #ffcccb;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .container {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .items {
+        width: 80%; /* Utilisez une largeur relative pour s'adapter à la taille de l'écran */
+    }
+
+    .item, .benefit {
+        width: 100%; /* Les éléments s'étendent pour occuper toute la largeur du conteneur */
+    }
 }
